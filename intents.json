@@ -1,0 +1,106 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": [
+        "Hi",
+        "Hello",
+        "Is anyone there?",
+        "Hey",
+        "Good morning",
+        "Good evening"
+      ],
+      "responses": [
+        "Hello! How can I assist you today?",
+        "Hi there, how may I help you?",
+        "Greetings! What can I do for you?"
+      ]
+    },
+    {
+      "tag": "goodbye",
+      "patterns": [
+        "Bye",
+        "See you later",
+        "Goodbye"
+      ],
+      "responses": [
+        "Goodbye! Have a great day!",
+        "See you later!",
+        "Bye! Take care."
+      ]
+    },
+    {
+      "tag": "thanks",
+      "patterns": [
+        "Thanks",
+        "Thank you",
+        "That's helpful",
+        "Thanks a lot"
+      ],
+      "responses": [
+        "You're welcome!",
+        "Glad I could help!",
+        "Anytime!"
+      ]
+    },
+    {
+      "tag": "open_account",
+      "patterns": [
+        "I want to open an account",
+        "Open savings account",
+        "Start a new bank account"
+      ],
+      "responses": [
+        "We can help with that. What type of account would you like to open?",
+        "I can assist you in opening an account. What type of account are you interested in?",
+        "Sure! What type of account would you like to open today?"
+      ]
+    },
+    {
+      "tag": "savings_account",
+      "patterns": [
+        "I want to open a savings account",
+        "Open savings account",
+        "Savings account please",
+        "I'd like to open a savings account",
+        "Start a savings account",
+        "Can I get a savings account?",
+        "Savings account opening",
+        "I need a savings account",
+        "How to open a savings account?"
+      ],
+      "responses": [
+        "Great choice! Let's open your savings account. What initial deposit amount are you considering?",
+        "Savings account is a great option. Do you have a preferred amount to start with?"
+      ]
+    },
+    {
+      "tag": "current_account",
+      "patterns": [
+        "I want to open a current account",
+        "Open a current account",
+        "I'd like a current account"
+      ],
+      "responses": [
+        "Excellent choice! We can open your current account. How much would you like to deposit initially?",
+        "You can start a current account with a small deposit. How much would you like to add?"
+      ]
+    },
+    {
+      "tag": "account_types",
+      "patterns": [
+        "What types of accounts do you have?",
+        "Tell me about your account types",
+        "List of accounts available",
+        "Available bank accounts",
+        "Types of accounts",
+        "I want to open a account",
+        "ගිනුම් වර්ග",
+        "ඔබේ ගිණුම් වර්ග මොනවාද?"
+      ],
+      "responses": [
+        "__get_account_types__"
+      ]
+    }
+  ]
+}

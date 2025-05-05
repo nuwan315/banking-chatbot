@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bank Assistant Chatbot</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="chat-container">
+        <h2>Bank Assistant Chatbot</h2>
+        <div class="chat-box" id="chat-box"></div>
+        
+        <!-- Typing indicator placeholder -->
+        <div id="typing-indicator" style="display: none;">
+            <img src="/static/typing.gif" alt="typing...">
+        </div>
+
+        <form id="chat-form">
+            <input type="text" id="user-input" autocomplete="off" placeholder="Type your message here..." required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('chat-form');
+        const chatBox = document.getElementById('chat-box');
+    
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('user-input');
+            const userText = input.value;
+            chatBox.innerHTML += `<div class='user-msg'><strong>You:</strong> ${userText}</div>`;
+            input.value = "";
+
+            // Show typing indicator
+            document.getElementById('typing-indicator').style.display = 'block';
+
+            const res = await fetch("/get", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `msg=${encodeURIComponent(userText)}`
+            });
+
+            const data = await res.json();
+
+            // Hide typing indicator
+            document.getElementById('typing-indicator').style.display = 'none';
+
+            // Show bot response and feedback buttons
+            const botHTML = `
+                <div class='bot-msg'>
+                    <div class="bot-avatar"></div> ${data.response}
+                    <div class="feedback">
+                        <button onclick="sendFeedback('${userText}', '${data.response}', 'positive')">👍</button>
+                        <button onclick="showTagSelection('${userText}')">👎</button>
+                    </div>
+                </div>
+            `;
+            chatBox.innerHTML += botHTML;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        };
+    
+        function sendFeedback(userMsg, botResp, type) {
+            fetch("/feedback", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    user_message: userMsg,
+                    bot_response: botResp,
+                    feedback_type: type
+                })
+            });
+            alert("Thanks for your feedback!");
+        }
+
+        function showTagSelection(userMsg) {
+            const tags = ['greeting', 'goodbye', 'open_account', 'savings_account', 'account_types'];
+            let tagButtons = tags.map(tag => `<button onclick="sendTagFeedback('${userMsg}', '${tag}')">${tag}</button>`).join(' ');
+            chatBox.innerHTML += `
+                <div class="bot-msg">
+                    <div class="tag-selection">
+                        <p>What was your actual intent?</p>
+                        ${tagButtons}
+                    </div>
+                </div>
+            `;
+        }
+
+        function sendTagFeedback(userMsg, correctTag) {
+            fetch("/tag_feedback", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    user_message: userMsg,
+                    correct_tag: correctTag
+                })
+            });
+            alert("Thanks for tagging the intent!");
+        }
+    </script>
+</body>
+</html>
