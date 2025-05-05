@@ -1,0 +1,8 @@
+Flask
+tensorflow
+keras
+numpy
+scikit-learn
+deep-translator
+spacy
+pyspellchecker
