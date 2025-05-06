@@ -30,8 +30,7 @@ cursor.executemany('''
 ''', [
     ('Savings Account',),
     ('Current Account',),
-    ('Fixed Deposit Account',),
-    ('Recurring Deposit Account',)
+    ('Fixed Deposit Account',)
 ])
 
 # Commit and close
