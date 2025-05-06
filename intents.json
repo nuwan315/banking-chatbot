@@ -87,6 +87,19 @@
       ]
     },
     {
+      "tag": "fixed_account",
+      "patterns": [
+        "I want to open a fixed account",
+        "Open a fixed account",
+        "Open a fd account",
+        "I'd like a FD account"
+      ],
+      "responses": [
+        "Minumum amount to depposit on FD accounts, 50,000LKR",
+        "We have 3months, 6months, 1year, and 5years deposit plans. Minumum amount is 50,000LKR"
+      ]
+    },
+    {
       "tag": "account_types",
       "patterns": [
         "What types of accounts do you have?",
