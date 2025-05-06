@@ -73,7 +73,7 @@
         }
 
         function showTagSelection(userMsg) {
-            const tags = ['greeting', 'goodbye', 'open_account', 'savings_account', 'account_types'];
+            const tags = ['greeting', 'goodbye', 'account_types', 'open_account', 'savings_account', 'current_account', 'fixed_account'];
             let tagButtons = tags.map(tag => `<button onclick="sendTagFeedback('${userMsg}', '${tag}')">${tag}</button>`).join(' ');
             chatBox.innerHTML += `
                 <div class="bot-msg">
