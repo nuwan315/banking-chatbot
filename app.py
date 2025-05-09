@@ -1,9 +1,23 @@
-import json
-import sqlite3
 from flask import Flask, render_template, request, jsonify
-from chatbot import get_response  # from your previous chatbot.py
+from chatbot import get_response  # From your previous chatbot.py
+import sqlite3
+from datetime import datetime
 
 app = Flask(__name__)
+
+# Helper function to interact with the database
+def execute_db_query(query, params=()):
+    try:
+        conn = sqlite3.connect('bank.db', timeout=10, check_same_thread=False)  # timeout to avoid locking
+        c = conn.cursor()
+        c.execute(query, params)
+        conn.commit()
+        conn.close()
+    except sqlite3.OperationalError as e:
+        print(f"[ERROR] Database operation failed: {e}")
+        return False
+    return True
+
 
 @app.route("/")
 def home():
@@ -15,44 +29,30 @@ def chatbot_response():
     response = get_response(user_input)
     return jsonify({"response": response})
 
-@app.route("/feedback", methods=["POST"])
-def save_feedback():
-    data = request.get_json()
-    user_message = data.get("user_message")
-    bot_response = data.get("bot_response")
-    feedback_type = data.get("feedback_type")
+@app.route("/submit_feedback", methods=["POST"])
+def submit_feedback():
+    feedback_data = request.get_json()
+    
+    # Get the feedback data
+    user_input = feedback_data.get("user_input")
+    correct_intent = feedback_data.get("correct_intent")
+    
+    # Validate the feedback data
+    if not user_input or not correct_intent:
+        return jsonify({"message": "Invalid feedback data"}), 400
 
-    try:
-        conn = sqlite3.connect('bank.db')
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO feedback (user_message, bot_response, feedback_type)
-            VALUES (?, ?, ?)
-        """, (user_message, bot_response, feedback_type))
-        conn.commit()
-        conn.close()
-        return jsonify({"status": "success"}), 200
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-@app.route("/tag_feedback", methods=["POST"])
-def save_tagged_feedback():
-    data = request.get_json()
-    user_message = data.get("user_message")
-    correct_tag = data.get("correct_tag")
-
-    try:
-        conn = sqlite3.connect('bank.db')
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO feedback (user_message, correct_tag)
-            VALUES (?, ?)
-        """, (user_message, correct_tag))
-        conn.commit()
-        conn.close()
-        return jsonify({"status": "success"}), 200
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+    # Get the current timestamp
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    
+    # Insert the feedback data into the feedback table in the database
+    query = """
+        INSERT INTO feedback (user_input, correct_intent, timestamp)
+        VALUES (?, ?, ?)
+    """
+    if execute_db_query(query, (user_input, correct_intent, timestamp)):
+        return jsonify({"message": "Feedback submitted successfully!"})
+    else:
+        return jsonify({"message": "Failed to submit feedback, please try again later."}), 500
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(debug=True)
