@@ -6,10 +6,10 @@
 </head>
 <body>
     <div class="chat-container">
-        <h2>Bank Assistant Chatbot</h2>
+        <h2>NOVA Chatbot</h2>
         <div class="chat-box" id="chat-box"></div>
-        
-        <!-- Typing indicator placeholder -->
+
+        <!-- Typing indicator -->
         <div id="typing-indicator" style="display: none;">
             <img src="/static/typing.gif" alt="typing...">
         </div>
@@ -23,11 +23,24 @@
     <script>
         const form = document.getElementById('chat-form');
         const chatBox = document.getElementById('chat-box');
-    
+        let lastUserInput = "";
+
+        // Show welcome message on load
+        window.onload = async () => {
+            const res = await fetch("/get", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: "msg=__welcome__"
+            });
+            const data = await res.json();
+            chatBox.innerHTML += `<div class='bot-msg'><div class="bot-avatar"></div> ${data.response}</div>`;
+        };
+
         form.onsubmit = async (e) => {
             e.preventDefault();
             const input = document.getElementById('user-input');
             const userText = input.value;
+            lastUserInput = userText;
             chatBox.innerHTML += `<div class='user-msg'><strong>You:</strong> ${userText}</div>`;
             input.value = "";
 
@@ -45,36 +58,48 @@
             // Hide typing indicator
             document.getElementById('typing-indicator').style.display = 'none';
 
-            // Show bot response and feedback buttons
-            const botHTML = `
+            // Show bot response
+            chatBox.innerHTML += `
                 <div class='bot-msg'>
                     <div class="bot-avatar"></div> ${data.response}
                     <div class="feedback">
-                        <button onclick="sendFeedback('${userText}', '${data.response}', 'positive')">👍</button>
-                        <button onclick="showTagSelection('${userText}')">👎</button>
+                        <button onclick="submitFeedback('positive')">👍</button>
+                        <button onclick="showTagSelection()">👎</button>
                     </div>
                 </div>
             `;
-            chatBox.innerHTML += botHTML;
             chatBox.scrollTop = chatBox.scrollHeight;
         };
-    
-        function sendFeedback(userMsg, botResp, type) {
-            fetch("/feedback", {
+
+        function submitFeedback(type) {
+            const correctTag = type === 'negative' ? document.getElementById('correct-intent')?.value : null;
+
+            fetch("/submit_feedback", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    user_message: userMsg,
-                    bot_response: botResp,
-                    feedback_type: type
+                    feedback_type: type,
+                    user_input: lastUserInput,
+                    correct_intent: correctTag
                 })
+            }).then(() => {
+                alert("Thanks for your feedback!");
             });
-            alert("Thanks for your feedback!");
         }
 
-        function showTagSelection(userMsg) {
-            const tags = ['greeting', 'goodbye', 'account_types', 'open_account', 'savings_account', 'current_account', 'fixed_account'];
-            let tagButtons = tags.map(tag => `<button onclick="sendTagFeedback('${userMsg}', '${tag}')">${tag}</button>`).join(' ');
+        function showTagSelection() {
+            const tags = [
+                'greeting',
+                'goodbye',
+                'account_types',
+                'balance_inquiry',
+                'fund_transfer',
+                'loan_info'
+            ];
+
+            const tagButtons = tags.map(tag => 
+                `<button onclick="sendTagFeedback('${tag}')">${tag}</button>`).join(' ');
+
             chatBox.innerHTML += `
                 <div class="bot-msg">
                     <div class="tag-selection">
@@ -83,18 +108,28 @@
                     </div>
                 </div>
             `;
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        function sendTagFeedback(userMsg, correctTag) {
-            fetch("/tag_feedback", {
+        function sendTagFeedback(correctTag) {
+            fetch("/submit_feedback", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    user_message: userMsg,
-                    correct_tag: correctTag
+                    feedback_type: 'negative',
+                    user_input: lastUserInput,
+                    correct_intent: correctTag
                 })
+            }).then(() => {
+                const chatBox = document.getElementById("chat-box");
+                const botReply = `
+                    <div class='bot-msg'>
+                        <div class="bot-avatar"></div> Thank you for helping me improve! Any more questions 😊
+                    </div>
+                `;
+                chatBox.innerHTML += botReply;
+                chatBox.scrollTop = chatBox.scrollHeight;
             });
-            alert("Thanks for tagging the intent!");
         }
     </script>
 </body>
