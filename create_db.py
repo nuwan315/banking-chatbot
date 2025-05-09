@@ -1,40 +1,49 @@
 import sqlite3
 
-# Connect to database (creates it if not exists)
+# Connect and create table
 conn = sqlite3.connect('bank.db')
-cursor = conn.cursor()
+c = conn.cursor()
 
-# Create table for account types
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS account_types (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL
-    )
-''')
+c.execute('''CREATE TABLE IF NOT EXISTS account_types (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL
+)''')
 
-# Create table for feedback
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS feedback (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_message TEXT NOT NULL,
-        correct_tag TEXT NOT NULL,
-        used_for_training INTEGER DEFAULT 0,
-        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-''')
-
-
-# Insert some sample account types
-cursor.executemany('''
-    INSERT INTO account_types (name) VALUES (?)
-''', [
+# Insert sample account types
+account_types = [
     ('Savings Account',),
     ('Current Account',),
     ('Fixed Deposit Account',)
-])
+]
 
-# Commit and close
+c.executemany('INSERT INTO account_types (name) VALUES (?)', account_types)
+
+c.execute('''CREATE TABLE IF NOT EXISTS accounts (
+    account_no INTEGER PRIMARY KEY,
+    name TEXT,
+    balance REAL
+)''')
+
+# Sample data
+accounts = [
+    ('111', 'Savings Account', 10000.00),
+    ('222', 'Current Account', 5000.00),
+    ('333', 'Fixed Deposit Account', 25000.00),
+    ('444', 'Current Account', 1500.00),
+    ('555', 'Savings Account', 7000.00)
+]
+
+c.executemany('INSERT OR REPLACE INTO accounts VALUES (?, ?, ?)', accounts)
+
+
+c.execute('''CREATE TABLE IF NOT EXISTS feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_input TEXT,
+            correct_intent TEXT,
+            timestamp TEXT
+)''')
+
 conn.commit()
 conn.close()
 
-print("Database and tables created with sample data.")
+print("Database and accounts table created.")
