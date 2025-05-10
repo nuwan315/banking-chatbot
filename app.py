@@ -53,6 +53,14 @@ def submit_feedback():
         return jsonify({"message": "Feedback submitted successfully!"})
     else:
         return jsonify({"message": "Failed to submit feedback, please try again later."}), 500
+    
+
+@app.route('/dashboard')
+def dashboard():
+    conn = sqlite3.connect('bank.db', timeout=10, check_same_thread=False)  # timeout to avoid locking
+    feedbacks = conn.execute('SELECT * FROM feedback').fetchall()  # Assuming 'feedback' is your table
+    conn.close()
+    return render_template('dashboard.html', feedbacks=feedbacks)
 
 if __name__ == "__main__":
     app.run(debug=True)
