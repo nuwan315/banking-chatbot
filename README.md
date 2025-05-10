@@ -3,9 +3,9 @@
 Follow these step by steps to setup NOVA bot on your envioronment.
 
 <b>Step 1</b><br>
-Run: pip install Flask tensorflow-cpu numpy deep-translator spacy pyspellchecker scikit-learn
-python -m spacy download en_core_web_sm
-
+Run: pip install Flask tensorflow-cpu numpy deep-translator spacy pyspellchecker scikit-learn<br>
+python -m spacy download en_core_web_sm<br>
+<br>
 Step 2
 
 To create database, run:
