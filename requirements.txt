@@ -4,3 +4,4 @@ numpy
 deep-translator
 spacy
 pyspellchecker
+scikit-learn
